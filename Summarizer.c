@@ -28,7 +28,7 @@ int main(int argc, char *argv[]) {
     }
     while (fgets(text, 15000, input) != NULL) { /* Read in each paragraph */
       /* process each paragraph */
-      get_sentences(sentences, text, &sentence_count);  
+      get_sentences(sentences, text, &sentence_count);
     }
     printf("number of sentences: %d\n", sentence_count);
   } else { /* Incorrect input */
@@ -41,22 +41,35 @@ int main(int argc, char *argv[]) {
 
 static void get_sentences(char * arr[], char * text, int * count) {
   char sentence[5000]; /* Holds the sentence */
-  int i, j = 0, length = strlen(text);
+  int i, j = 0, length = strlen(text), quotes_seen = 0;
+  int end_sentence = 0;
 
   for (i = 0; i < length; i++) {
     while (isspace(text[i]) && j == 0) { /* Skip over preceding whitespace */
         i++;
     }
-    sentence[j++] = text[i]; /* Copy text over */
+
+    /* If current character is a quotation mark */
+    if (text[i] == '\"' || text[i] == -100 || text[i] == -99) {
+      quotes_seen++;
+    }
+    sentence[j++] = text[i]; /* Copy text over normally otherwise */
 
     /* End of sentence */
     if (text[i] == '.' || text[i] == '!' || text[i] == '?') {
+      if (quotes_seen % 2 != 0) { /* If not all quotes copied over */
+        sentence[j++] = '"'; /* Add end quote */
+        /* Case: End of quote != end of sentence
+        if (text[i] != '.' || text[i] != '!' || text[i] != '?') {
+          end_sentence = 0;
+        }*/
+      }
       sentence[j] = '\0'; /* Null character to make string */
       j = 0;
       (*count)++; /* Increment # of sentences */
+
       printf("%s\n\n", sentence);
-      memset(sentence, 0, sizeof(sentence)); 
+      memset(sentence, 0, sizeof(sentence));
     }
   }
-
 }
