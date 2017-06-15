@@ -8,15 +8,17 @@
 #include "Summarizer.h"
 
 static void get_sentences(char arr[][5000], char arr2[], int * count);
+static void get_words(Word_Map * map[], char text[], int * count);
 
 int main(int argc, char *argv[]) {
 
   FILE * input;
-  Word_Map *map[3000]; /* Array of pointers to structs (max 3000 words) */
-  char sentences[100][5000]; // Hold 100  sentences of article in order */
-  char text[5000]; /* Array that holds read in paragraphs (max 5000 chars) */
-  int sentence_count = 0; /* number of sentences */
+  Word_Map * map[3000]; // Array of pointers to structs (max 3000 words)
+  char sentences[100][5000]; // Hold 100  sentences of article in order
+  char text[5000]; // Array that holds read in paragraphs (max 5000 chars)
+  int sentence_count = 0, word_count = 0; // # unique sentences/words
   int i;
+
 
   if (argc == 1) {
     /* inplement pasting into terminal case later */
@@ -27,10 +29,16 @@ int main(int argc, char *argv[]) {
       fprintf(stderr, "%s cannot be opened.\n", argv[1]);
       exit(EX_OSERR);
     }
-    while (fgets(text, 15000, input) != NULL) { /* Read in each paragraph */
-      /* process each paragraph */
+    while (fgets(text, 15000, input) != NULL) { // Read in each paragraph
+      // Process each paragraph
       get_sentences(sentences, text, &sentence_count);
     }
+    for (i = 0; i < sentence_count; i++) { // Process each sentence
+      get_words(map, sentences[i], &word_count);
+    }
+    /*for (int f = 0; f < word_count; f++) {
+      printf("word: %s frequency: %d\n", (map[f])->word, map[f]->count);
+    }*/
   } else { /* Incorrect input */
     fprintf(stderr, "Usage: a.out");
     fprintf(stderr, "Usage: a.out <filename>\n");
@@ -40,6 +48,7 @@ int main(int argc, char *argv[]) {
 }
 
 static void get_sentences(char arr[][5000], char * text, int * count) {
+
   char sentence[5000]; /* Holds the sentence */
   int i, j = 0, length = strlen(text), quotes_seen = 0;
 
