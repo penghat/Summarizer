@@ -74,3 +74,34 @@ static void get_sentences(char arr[][5000], char * text, int * count) {
     }
   }
 }
+
+static void get_words(Word_Map * map[], char * text, int * count) {
+
+  int i, j = 0, length = strlen(text), word_found = 0;
+  char word[25];
+
+  for (i = 0; i < length; i++) { /* Get individual words */
+
+    while (isalpha(text[i]) || isdigit(text[i]) ||
+           text[i] == '-' || text[i] == -103) {
+      word[j++] = text[i++];
+    }
+    if (isspace(text[i])) {
+      for (int k = 0; k < *count; k++) { // See if word already added
+        if (strcasecmp((map[k])->word, word) == 0) {
+            (map[k])->count++;  // Increment frequency
+            word_found = 1;
+        }
+      }
+      if (word_found == 0) { // If word not added to map yet create new map
+        map[*count] = malloc(sizeof(Word_Map));
+        strcpy((map[*count])->word, word);
+        (map[*count])->count = 1;
+        (*count)++; // Increment # of unique words
+      }
+      word_found = 0; // Reset boolean that indicates if word already added
+      j = 0;
+      memset(word, 0, sizeof(word)); // Clear word
+    }
+  }
+}
