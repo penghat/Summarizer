@@ -9,6 +9,9 @@
 
 static void get_sentences(char arr[][5000], char arr2[], int * count);
 static void get_words(Word_Map * map[], char text[], int * count);
+static void score_sentences(Word_Map * map[], char * text,
+                            int scores[], int * index, int word_count);
+
 
 int main(int argc, char *argv[]) {
 
@@ -17,7 +20,7 @@ int main(int argc, char *argv[]) {
   char sentences[100][5000]; // Hold 100  sentences of article in order
   char text[5000]; // Array that holds read in paragraphs (max 5000 chars)
   int sentence_count = 0, word_count = 0; // # unique sentences/words
-  int i;
+  int scores[100], index = 0;
 
   if (argc == 1) {
     // inplement pasting into terminal case later
@@ -31,8 +34,12 @@ int main(int argc, char *argv[]) {
     while (fgets(text, 15000, input) != NULL) { // Read in each paragraph
       get_sentences(sentences, text, &sentence_count); // Process paragraph
     }
-    for (i = 0; i < sentence_count; i++) { // Process sentence
+    for (int i = 0; i < sentence_count; i++) { // Process sentence
       get_words(map, sentences[i], &word_count);
+    }
+    for (int i = 0; i < sentence_count; i++) { // Process sentence
+      score_sentences(map, sentences[i],
+                            scores, &index, word_count);
     }
     /*for (int f = 0; f < word_count; f++) {
       printf("word: %s frequency: %d\n", (map[f])->word, map[f]->count);
@@ -113,4 +120,30 @@ static void get_words(Word_Map * map[], char * text, int * count) {
       memset(word, 0, sizeof(word)); // Clear word
     }
   }
+}
+
+static void score_sentences(Word_Map * map[], char * text, int scores[],
+                            int * index, int word_count) {
+
+  int  score = 0, j = 0, length = strlen(text);
+  char word[25];
+
+  for (int i = 0; i < length; i++) { // Get individual words + scores
+
+    while (isalpha(text[i]) || isdigit(text[i]) ||
+           text[i] == '-' || text[i] == -103) {
+      word[j++] = text[i++];
+    }
+
+    if (isspace(text[i])) { // End of word reached
+      for (int k = 0; k < word_count; k++) { // Add count value to total
+        if (strcasecmp((map[k])->word, word) == 0) {
+            score += (map[k])->count;
+        }
+      }
+      j = 0;
+      memset(word, 0, sizeof(word)); // Clear word
+    }
+  }
+  scores[(*index)++] = score; // Store total sentence score in array
 }
