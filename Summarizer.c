@@ -13,14 +13,15 @@ static void score_sentences(Word_Map * map[], char * text,
                             int scores[], int * index, int word_count);
 
 
-int main(int argc, char *argv[]) {
+int main(int argc, char * argv[]) {
 
   FILE * input;
   Word_Map * map[3000]; // Array of pointers to structs (max 3000 words)
-  char sentences[100][5000]; // Hold 100  sentences of article in order
-  char text[5000]; // Array that holds read in paragraphs (max 5000 chars)
+  char sentences[100][5000]; // Holds 100 sentences of article in order
+  char text[5000]; // Holds read in paragraphs (max 5000 chars)
   int sentence_count = 0, word_count = 0; // # unique sentences/words
-  int scores[100], index = 0;
+  int scores[100], index = 0; // Hold the scores of each sentence
+  int summary_length; // The # of sentences to include in the summary
 
   if (argc == 3) {
     input = fopen(argv[1], "r");
@@ -28,9 +29,18 @@ int main(int argc, char *argv[]) {
       fprintf(stderr, "%s cannot be opened.\n", argv[1]);
       exit(EX_OSERR);
     }
+
     while (fgets(text, 15000, input) != NULL) { // Read in each paragraph
       get_sentences(sentences, text, &sentence_count); // Process paragraph
     }
+
+     // Set # of sentences in final summary
+    if (atoi(argv[2]) > sentence_count) {
+      summary_length = sentence_count;
+    } else { // # sentences user wants < # sentences (good/ok)
+      summary_length = atoi(argv[2]);
+    }
+
     for (int i = 0; i < sentence_count; i++) { // Process sentences
       get_words(map, sentences[i], &word_count);
     }
