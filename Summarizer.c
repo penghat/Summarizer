@@ -55,9 +55,9 @@ int main(int argc, char *argv[]) {
 static void get_sentences(char arr[][5000], char * text, int * count) {
 
   char sentence[5000]; // Holds the sentence
-  int i, j = 0, length = strlen(text), quotes_seen = 0;
+  int j = 0, length = strlen(text), quotes_seen = 0;
 
-  for (i = 0; i < length; i++) {
+  for (int i = 0; i < length; i++) {
     while (isspace(text[i]) && j == 0) { // Skip over preceding whitespace
         i++;
     }
@@ -91,10 +91,10 @@ static void get_sentences(char arr[][5000], char * text, int * count) {
 
 static void get_words(Word_Map * map[], char * text, int * count) {
 
-  int i, j = 0, length = strlen(text), word_found = 0;
+  int j = 0, length = strlen(text), word_found = 0;
   char word[25];
 
-  for (i = 0; i < length; i++) { // Get individual words
+  for (int i = 0; i < length; i++) { // Get individual words
 
     while (isalpha(text[i]) || isdigit(text[i]) ||
            text[i] == '-' || text[i] == -103) {
