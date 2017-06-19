@@ -22,22 +22,19 @@ int main(int argc, char *argv[]) {
   int sentence_count = 0, word_count = 0; // # unique sentences/words
   int scores[100], index = 0;
 
-  if (argc == 1) {
-    // inplement pasting into terminal case later
-
-  } else if (argc == 2) {
+  if (argc == 3) {
     input = fopen(argv[1], "r");
-    if (input == NULL) {
+    if (input == NULL) { // File with text does not exist
       fprintf(stderr, "%s cannot be opened.\n", argv[1]);
       exit(EX_OSERR);
     }
     while (fgets(text, 15000, input) != NULL) { // Read in each paragraph
       get_sentences(sentences, text, &sentence_count); // Process paragraph
     }
-    for (int i = 0; i < sentence_count; i++) { // Process sentence
+    for (int i = 0; i < sentence_count; i++) { // Process sentences
       get_words(map, sentences[i], &word_count);
     }
-    for (int i = 0; i < sentence_count; i++) { // Process sentence
+    for (int i = 0; i < sentence_count; i++) { // Score sentences
       score_sentences(map, sentences[i],
                             scores, &index, word_count);
     }
@@ -46,7 +43,7 @@ int main(int argc, char *argv[]) {
     }*/
   } else { // Incorrect input
     fprintf(stderr, "Usage: a.out");
-    fprintf(stderr, "Usage: a.out <filename>\n");
+    fprintf(stderr, "Usage: a.out <filename> <# of lines in summary>\n");
     exit(EX_USAGE);
   }
   return 0;
