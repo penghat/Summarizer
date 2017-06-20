@@ -6,4 +6,9 @@ typedef struct word_map {
   int count;
 } Word_Map;
 
+typedef struct score_index {
+  int score;
+  int index;
+} Score_Index;
+
 #endif
