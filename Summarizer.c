@@ -11,6 +11,8 @@ static void get_sentences(char arr[][5000], char arr2[], int * count);
 static void get_words(Word_Map * map[], char text[], int * count);
 static void score_sentences(Word_Map * map[], char * text,
                             int scores[], int * index, int word_count);
+static void get_highest_sentences(int scores[], int indices[],
+                                  int summary_length, int scores_length);
 
 
 int main(int argc, char * argv[]) {
@@ -22,6 +24,7 @@ int main(int argc, char * argv[]) {
   int sentence_count = 0, word_count = 0; // # unique sentences/words
   int scores[100], index = 0; // Hold the scores of each sentence
   int summary_length; // The # of sentences to include in the summary
+  int indices[100]; // Sentences to print in summary (highest)
 
   if (argc == 3) {
     input = fopen(argv[1], "r");
@@ -48,6 +51,8 @@ int main(int argc, char * argv[]) {
       score_sentences(map, sentences[i],
                             scores, &index, word_count);
     }
+    get_highest_sentences(scores, indices, summary_length, sentence_count);
+
     /*for (int f = 0; f < word_count; f++) {
       printf("word: %s frequency: %d\n", (map[f])->word, map[f]->count);
     }*/
@@ -153,4 +158,16 @@ static void score_sentences(Word_Map * map[], char * text, int scores[],
     }
   }
   scores[(*index)++] = score; // Store total sentence score in array
+}
+
+static void get_highest_sentences(int scores[], int indices[],
+                                  int summary_length, int scores_length) {
+
+  Score_Index * map[100]; // Array of scores + their indices
+
+  for (int i = 0; i < scores_length; i++) { // Store scores & indices in map
+    map[i] = malloc(sizeof(Score_Index));
+    (map[i])->score = scores[i];
+    (map[i])->index = i;
+  }
 }
