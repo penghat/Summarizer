@@ -13,6 +13,8 @@ static void score_sentences(Word_Map * map[], char * text,
                             int scores[], int * index, int word_count);
 static void get_highest_sentences(int scores[], int indices[],
                                   int summary_length, int scores_length);
+static void sort_score(Score_Index * map[], int length);
+static void sort_index(Score_Index * map[], int length);
 
 
 int main(int argc, char * argv[]) {
@@ -169,5 +171,33 @@ static void get_highest_sentences(int scores[], int indices[],
     map[i] = malloc(sizeof(Score_Index));
     (map[i])->score = scores[i];
     (map[i])->index = i;
+  }
+  sort_score(map, scores_length); // Sort map by scores on sentences
+  sort_index(map, summary_length); // Sort map by indices for printing
+}
+
+static void sort_score(Score_Index * map[], int length) {
+
+  for (int i = 0; i < length; i++) {
+    for (int j = 0; j < length - 1; j++) {
+      if (map[j]->score < map[j+1]->score) {
+        Score_Index * temp = map[j+1];
+        map[j+1] = map[j];
+        map[j] = temp;
+      }
+    }
+  }
+}
+
+static void sort_index(Score_Index * map[], int length) {
+
+  for (int i = 0; i < length; i++) {
+    for (int j = 0; j < length - 1; j++) {
+      if (map[j]->index > map[j+1]->index) {
+        Score_Index * temp = map[j+1];
+        map[j+1] = map[j];
+        map[j] = temp;
+      }
+    }
   }
 }
