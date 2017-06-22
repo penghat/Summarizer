@@ -15,7 +15,8 @@ static void get_highest_sentences(int scores[], int indices[],
                                   int summary_length, int scores_length);
 static void sort_score(Score_Index * map[], int length);
 static void sort_index(Score_Index * map[], int length);
-
+static void print_summary(char sentences[][5000], int indices[],
+                          int summary_length);
 
 int main(int argc, char * argv[]) {
 
@@ -54,10 +55,7 @@ int main(int argc, char * argv[]) {
                             scores, &index, word_count);
     }
     get_highest_sentences(scores, indices, summary_length, sentence_count);
-
-    /*for (int f = 0; f < word_count; f++) {
-      printf("word: %s frequency: %d\n", (map[f])->word, map[f]->count);
-    }*/
+    print_summary(sentences, indices, summary_length);
   } else { // Incorrect input
     fprintf(stderr, "Usage: a.out");
     fprintf(stderr, "Usage: a.out <filename> <# of lines in summary>\n");
@@ -202,5 +200,14 @@ static void sort_index(Score_Index * map[], int length) {
         map[j] = temp;
       }
     }
+  }
+}
+
+static void print_summary(char sentences[][5000], int indices[],
+                          int summary_length) {
+
+  for (int i = 0; i < summary_length; i++) {
+    int index = indices[i];
+    printf("%s\n\n", sentences[index]);
   }
 }
