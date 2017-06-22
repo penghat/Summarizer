@@ -174,6 +174,9 @@ static void get_highest_sentences(int scores[], int indices[],
   }
   sort_score(map, scores_length); // Sort map by scores on sentences
   sort_index(map, summary_length); // Sort map by indices for printing
+  for (int j = 0; j < summary_length; j++) { // Store indices of sentences
+    indices[j] = map[j]->index;
+  }
 }
 
 static void sort_score(Score_Index * map[], int length) {
