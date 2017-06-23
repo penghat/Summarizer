@@ -16,7 +16,8 @@
 
 static void get_sentences(char sentences[][MAX_CHARS], char text[],
                           int * count);
-static void get_words(Word_Map * map[], char text[], int * count);
+static void get_words(Word_Map * map[], char text[],
+                      int * count, float * total);
 static void score_sentences(Word_Map * map[], char * text,
                             int scores[], int * index, int word_count);
 static void get_highest_sentences(int scores[], int indices[],
@@ -24,7 +25,9 @@ static void get_highest_sentences(int scores[], int indices[],
 static void sort_score(Score_Index * map[], int length);
 static void sort_index(Score_Index * map[], int length);
 static void print_summary(char sentences[][MAX_CHARS], int indices[],
-                          int summary_length, char * name);
+                          int summary_length, char * name,
+                          float summary_total, float total);
+static float get_number_words(char * text);
 
 int main(int argc, char * argv[]) {
 
@@ -36,6 +39,7 @@ int main(int argc, char * argv[]) {
   int indices[MAX_SENTENCES]; // Sentences to print in summary (highest)
   int summary_length; // The # of sentences to include in the summary
   int sentence_count = 0, word_count = 0; // The unique # of sentences/words
+  float total_words = 0, summary_words = 0;
 
   if (argc == 3) {
     input = fopen(argv[1], "r");
@@ -57,14 +61,15 @@ int main(int argc, char * argv[]) {
     }
 
     for (int i = 0; i < sentence_count; i++) { // Process sentences
-      get_words(map, sentences[i], &word_count);
+      get_words(map, sentences[i], &word_count, &total_words );
     }
     for (int i = 0; i < sentence_count; i++) { // Score sentences
       score_sentences(map, sentences[i],
                             scores, &index, word_count);
     }
     get_highest_sentences(scores, indices, summary_length, sentence_count);
-    print_summary(sentences, indices, summary_length, argv[1]);
+    print_summary(sentences, indices, summary_length, argv[1],
+                  summary_words, total_words);
   } else { // Incorrect input
     fprintf(stderr, "Usage: a.out");
     fprintf(stderr, "Usage: a.out <filename> <# of lines in summary>\n");
@@ -114,7 +119,8 @@ static void get_sentences(char arr[][MAX_CHARS], char * text, int * count) {
 
 /* Parse the words of each sentence and keep count of their frequency. *
  * Keep track of the number of words for use throughout the program.   */
-static void get_words(Word_Map * map[], char * text, int * count) {
+static void get_words(Word_Map * map[], char * text, int * count,
+                      float * total) {
 
   int j = 0, length = strlen(text), word_found = 0;
   char word[25];
@@ -140,6 +146,7 @@ static void get_words(Word_Map * map[], char * text, int * count) {
         (*count)++; // Increment # of unique words
       }
 
+      (*total)++;
       word_found = 0; // Reset boolean that indicates if word already added
       j = 0;
       memset(word, 0, sizeof(word)); // Clear word
@@ -226,9 +233,11 @@ static void sort_index(Score_Index * map[], int length) {
 
 /* Write the summary to a text file. */
 static void print_summary(char sentences[][MAX_CHARS], int indices[],
-                          int summary_length, char * name) {
+                          int summary_length, char * name,
+                          float summary_total, float total) {
   FILE *output;
   char filename[100];
+  float percent = 0;
 
   // Name of output file == 'input_summary.txt'
   for (int i = 0; i < strlen(name); i++) {
@@ -244,9 +253,36 @@ static void print_summary(char sentences[][MAX_CHARS], int indices[],
   for (int i = 0; i < summary_length; i++) {
     int index = indices[i];
     fputs(sentences[index], output);
+    summary_total += get_number_words(sentences[index]);
     if (i + 1 != summary_length) {
       fputs("\n\n", output);
     }
   }
+  printf("The summary has been written to the file: %s.\n", filename);
+  printf("The original article was %.2f words long.\n", total);
+  printf("The summary is %.2f words long.\n", summary_total);
+  percent = 100 * ((total - summary_total)/total);
+  printf("The summary shortened the article by %.2f percent.\n", percent);
   fclose(output);
+}
+
+static float get_number_words(char * text) {
+  int j = 0, length = strlen(text);
+  float total = 0;
+  char word[25];
+
+  for (int i = 0; i < length; i++) { // Get individual words
+
+    while (isalpha(text[i]) || isdigit(text[i]) ||
+           text[i] == '-' || text[i] == -103) {
+      word[j++] = text[i++];
+    }
+
+    if (isspace(text[i])) { // End of word reached
+      total++;
+      j = 0;
+      memset(word, 0, sizeof(word)); // Clear word
+    }
+  }
+  return total;
 }
