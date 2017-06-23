@@ -1,4 +1,7 @@
-/* This program will summarize the text of an article */
+/* Summarizer.c                                             *
+ * Ananth Penghat                                           *
+ * 23 June 2017                                             *
+ * This program create a summary of the text of an article. */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -70,6 +73,8 @@ int main(int argc, char * argv[]) {
   return 0;
 }
 
+/* Read in the text of the article from the text file into a 2D array.   *
+ * Keep track of the number of sentences for use throughout the program. */
 static void get_sentences(char arr[][MAX_CHARS], char * text, int * count) {
 
   char sentence[MAX_CHARS]; // Holds the sentence
@@ -107,6 +112,8 @@ static void get_sentences(char arr[][MAX_CHARS], char * text, int * count) {
   }
 }
 
+/* Parse the words of each sentence and keep count of their frequency. *
+ * Keep track of the number of words for use throughout the program.   */
 static void get_words(Word_Map * map[], char * text, int * count) {
 
   int j = 0, length = strlen(text), word_found = 0;
@@ -140,6 +147,8 @@ static void get_words(Word_Map * map[], char * text, int * count) {
   }
 }
 
+/* Use the frequency of each word in a sentence to 'score' each sentence. *
+ * A score is the sum of the frequencies of the words in the sentence.    */
 static void score_sentences(Word_Map * map[], char * text, int scores[],
                             int * index, int word_count) {
 
@@ -166,6 +175,9 @@ static void score_sentences(Word_Map * map[], char * text, int scores[],
   scores[(*index)++] = score; // Store total sentence score in array
 }
 
+/* Find and store the 'x' number of sentences with the highest scores. *
+ * Sentences with higher scores have more repeated/relevant words.     *
+ * The user specifies the number of high scoring sentences to store.   */
 static void get_highest_sentences(int scores[], int indices[],
                                   int summary_length, int scores_length) {
 
@@ -183,6 +195,7 @@ static void get_highest_sentences(int scores[], int indices[],
   }
 }
 
+/* Bubblesort to sort the scored sentences by score in descending order. */
 static void sort_score(Score_Index * map[], int length) {
 
   for (int i = 0; i < length; i++) {
@@ -196,6 +209,8 @@ static void sort_score(Score_Index * map[], int length) {
   }
 }
 
+/* Bubblesort to sort the scored sentences by index in ascending order. *
+ * Index refers to the sentence's position in the original article.     */
 static void sort_index(Score_Index * map[], int length) {
 
   for (int i = 0; i < length; i++) {
@@ -209,6 +224,7 @@ static void sort_index(Score_Index * map[], int length) {
   }
 }
 
+/* Write the summary to a text file. */
 static void print_summary(char sentences[][MAX_CHARS], int indices[],
                           int summary_length, char * name) {
   FILE *output;
