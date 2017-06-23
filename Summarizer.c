@@ -7,7 +7,12 @@
 #include <sysexits.h>
 #include "Summarizer.h"
 
-static void get_sentences(char arr[][5000], char arr2[], int * count);
+#define MAX_SENTENCES 100
+#define MAX_WORDS 3000
+#define MAX_CHARS 5000
+
+static void get_sentences(char sentences[][MAX_CHARS], char text[],
+                          int * count);
 static void get_words(Word_Map * map[], char text[], int * count);
 static void score_sentences(Word_Map * map[], char * text,
                             int scores[], int * index, int word_count);
@@ -15,19 +20,19 @@ static void get_highest_sentences(int scores[], int indices[],
                                   int summary_length, int scores_length);
 static void sort_score(Score_Index * map[], int length);
 static void sort_index(Score_Index * map[], int length);
-static void print_summary(char sentences[][5000], int indices[],
+static void print_summary(char sentences[][MAX_CHARS], int indices[],
                           int summary_length, char * name);
 
 int main(int argc, char * argv[]) {
 
   FILE * input;
-  Word_Map * map[3000]; // Array of pointers to structs (max 3000 words)
-  char sentences[100][5000]; // Holds 100 sentences of article in order
-  char text[5000]; // Holds read in paragraphs (max 5000 chars)
-  int sentence_count = 0, word_count = 0; // # unique sentences/words
-  int scores[100], index = 0; // Hold the scores of each sentence
+  Word_Map * map[MAX_WORDS]; // Array of pointers to structs of unique words
+  char sentences[MAX_SENTENCES][MAX_CHARS]; // Holds sentences in order
+  char text[MAX_CHARS]; // Holds read in paragraphs
+  int scores[MAX_SENTENCES], index = 0; // Hold the scores of each sentence
+  int indices[MAX_SENTENCES]; // Sentences to print in summary (highest)
   int summary_length; // The # of sentences to include in the summary
-  int indices[100]; // Sentences to print in summary (highest)
+  int sentence_count = 0, word_count = 0; // The unique # of sentences/words
 
   if (argc == 3) {
     input = fopen(argv[1], "r");
@@ -36,7 +41,7 @@ int main(int argc, char * argv[]) {
       exit(EX_OSERR);
     }
 
-    while (fgets(text, 15000, input) != NULL) { // Read in each paragraph
+    while (fgets(text, MAX_CHARS, input) != NULL) { // Read in paragraphs
       get_sentences(sentences, text, &sentence_count); // Process paragraph
     }
     fclose(input);
@@ -65,9 +70,9 @@ int main(int argc, char * argv[]) {
   return 0;
 }
 
-static void get_sentences(char arr[][5000], char * text, int * count) {
+static void get_sentences(char arr[][MAX_CHARS], char * text, int * count) {
 
-  char sentence[5000]; // Holds the sentence
+  char sentence[MAX_CHARS]; // Holds the sentence
   int j = 0, length = strlen(text), quotes_seen = 0;
 
   for (int i = 0; i < length; i++) {
@@ -164,7 +169,7 @@ static void score_sentences(Word_Map * map[], char * text, int scores[],
 static void get_highest_sentences(int scores[], int indices[],
                                   int summary_length, int scores_length) {
 
-  Score_Index * map[100]; // Array of scores + their indices
+  Score_Index * map[MAX_SENTENCES]; // Array of scores + their indices
 
   for (int i = 0; i < scores_length; i++) { // Store scores & indices in map
     map[i] = malloc(sizeof(Score_Index));
@@ -204,7 +209,7 @@ static void sort_index(Score_Index * map[], int length) {
   }
 }
 
-static void print_summary(char sentences[][5000], int indices[],
+static void print_summary(char sentences[][MAX_CHARS], int indices[],
                           int summary_length, char * name) {
   FILE *output;
   char filename[100];
