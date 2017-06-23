@@ -244,7 +244,9 @@ static void print_summary(char sentences[][MAX_CHARS], int indices[],
   for (int i = 0; i < summary_length; i++) {
     int index = indices[i];
     fputs(sentences[index], output);
-    fputs("\n", output);
+    if (i + 1 != summary_length) {
+      fputs("\n\n", output);
+    }
   }
   fclose(output);
 }
