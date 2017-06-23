@@ -16,7 +16,7 @@ static void get_highest_sentences(int scores[], int indices[],
 static void sort_score(Score_Index * map[], int length);
 static void sort_index(Score_Index * map[], int length);
 static void print_summary(char sentences[][5000], int indices[],
-                          int summary_length);
+                          int summary_length, char * name);
 
 int main(int argc, char * argv[]) {
 
@@ -39,6 +39,7 @@ int main(int argc, char * argv[]) {
     while (fgets(text, 15000, input) != NULL) { // Read in each paragraph
       get_sentences(sentences, text, &sentence_count); // Process paragraph
     }
+    fclose(input);
 
      // Set # of sentences in final summary
     if (atoi(argv[2]) > sentence_count) {
@@ -55,7 +56,7 @@ int main(int argc, char * argv[]) {
                             scores, &index, word_count);
     }
     get_highest_sentences(scores, indices, summary_length, sentence_count);
-    print_summary(sentences, indices, summary_length);
+    print_summary(sentences, indices, summary_length, argv[1]);
   } else { // Incorrect input
     fprintf(stderr, "Usage: a.out");
     fprintf(stderr, "Usage: a.out <filename> <# of lines in summary>\n");
@@ -204,10 +205,25 @@ static void sort_index(Score_Index * map[], int length) {
 }
 
 static void print_summary(char sentences[][5000], int indices[],
-                          int summary_length) {
+                          int summary_length, char * name) {
+  FILE *output;
+  char filename[100];
 
+  // Name of output file == 'input_summary.txt'
+  for (int i = 0; i < strlen(name); i++) {
+    if (name[i] == '.') {
+      filename[i] = '\0';
+      strcat(filename, "_summary.txt");
+      break;
+    }
+    filename[i] = name[i];
+  }
+
+ output = fopen(filename, "w");
   for (int i = 0; i < summary_length; i++) {
     int index = indices[i];
-    printf("%s\n\n", sentences[index]);
+    fputs(sentences[index], output);
+    fputs("\n", output);
   }
+  fclose(output);
 }
