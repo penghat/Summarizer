@@ -1,7 +1,7 @@
-/* Summarizer.c                                             *
- * Ananth Penghat                                           *
- * 23 June 2017                                             *
- * This program create a summary of the text of an article. */
+/* Summarizer.c                                              *
+ * Ananth Penghat                                            *
+ * 23 June 2017                                              *
+ * This program creates a summary of the text of an article. */
 
 #include <stdio.h>
 #include <stdlib.h>
